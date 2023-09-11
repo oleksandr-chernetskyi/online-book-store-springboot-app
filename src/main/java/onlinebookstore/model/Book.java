@@ -8,9 +8,13 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import java.math.BigDecimal;
 import java.util.Objects;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 
 @Entity
 @Table(name = "books")
+@SQLDelete(sql = "UPDATE books SET is_deleted = true WHERE id=?")
+@Where(clause = "is_deleted = false")
 public class Book {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,6 +29,8 @@ public class Book {
     private BigDecimal price;
     private String description;
     private String coverImage;
+    @Column(nullable = false)
+    private boolean isDeleted = false;
 
     public Long getId() {
         return id;
@@ -82,6 +88,14 @@ public class Book {
         this.coverImage = coverImage;
     }
 
+    public boolean isDeleted() {
+        return isDeleted;
+    }
+
+    public void setDeleted(boolean deleted) {
+        isDeleted = deleted;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -91,7 +105,8 @@ public class Book {
             return false;
         }
         Book book = (Book) o;
-        return Objects.equals(id, book.id)
+        return isDeleted == book.isDeleted
+                && Objects.equals(id, book.id)
                 && Objects.equals(title, book.title)
                 && Objects.equals(author, book.author)
                 && Objects.equals(isbn, book.isbn)
@@ -102,7 +117,7 @@ public class Book {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, title, author, isbn, price, description, coverImage);
+        return Objects.hash(id, title, author, isbn, price, description, coverImage, isDeleted);
     }
 
     @Override
@@ -115,6 +130,7 @@ public class Book {
                 + ", price=" + price
                 + ", description='" + description + '\''
                 + ", coverImage='" + coverImage + '\''
+                + ", isDeleted=" + isDeleted
                 + '}';
     }
 }
