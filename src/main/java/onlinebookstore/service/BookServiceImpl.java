@@ -1,15 +1,17 @@
 package onlinebookstore.service;
 
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import onlinebookstore.dto.BookDto;
-import onlinebookstore.dto.BookSearchParameters;
 import onlinebookstore.dto.CreateBookRequestDto;
 import onlinebookstore.exception.EntityNotFoundException;
 import onlinebookstore.mapper.BookMapper;
 import onlinebookstore.model.Book;
+import onlinebookstore.repository.SpecificationManager;
 import onlinebookstore.repository.book.BookRepository;
-import onlinebookstore.repository.book.BookSpecificationBuilder;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
@@ -18,7 +20,7 @@ import org.springframework.stereotype.Service;
 public class BookServiceImpl implements BookService {
     private final BookRepository bookRepository;
     private final BookMapper bookMapper;
-    private final BookSpecificationBuilder bookSpecificationBuilder;
+    private final SpecificationManager<Book> specificationManager;
 
     @Override
     public BookDto save(CreateBookRequestDto requestDto) {
@@ -60,12 +62,17 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public List<BookDto> search(BookSearchParameters searchParameters) {
-        Specification<Book> bookSpecification = bookSpecificationBuilder.build(searchParameters);
-        return bookRepository.findAll(bookSpecification)
-                .stream()
+    public List<BookDto> findAllByParams(Map<String, String> parameters, Pageable pageable) {
+        Specification<Book> specification = null;
+        for (Map.Entry<String, String> entry : parameters.entrySet()) {
+            Specification<Book> spec = specificationManager.get(entry.getKey(),
+                    entry.getValue().split(","));
+            specification = specification == null
+                    ? Specification.where(spec) : specification.and(spec);
+        }
+        assert specification != null;
+        return bookRepository.findAll(specification, pageable).stream()
                 .map(bookMapper::toDto)
-                .toList();
+                .collect(Collectors.toList());
     }
-
 }
