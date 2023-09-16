@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import onlinebookstore.exception.KeyNotSupportException;
 import onlinebookstore.model.Book;
 import onlinebookstore.repository.SpecificationManager;
 import onlinebookstore.repository.SpecificationProvider;
@@ -27,7 +28,7 @@ public class BookSpecificationManager implements SpecificationManager<Book> {
     @Override
     public Specification<Book> get(String filterKey, String[] parameters) {
         if (!providersMap.containsKey(filterKey)) {
-            throw new RuntimeException("Key " + filterKey + " is not supported");
+            throw new KeyNotSupportException("Key " + filterKey + " is not supported");
         }
         return providersMap.get(filterKey).getSpecification(parameters);
     }

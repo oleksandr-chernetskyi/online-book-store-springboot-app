@@ -14,6 +14,7 @@ import onlinebookstore.repository.book.BookRepository;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 
 @Service
 @RequiredArgsConstructor
@@ -35,6 +36,7 @@ public class BookServiceImpl implements BookService {
                 .toList();
     }
 
+    @ExceptionHandler
     @Override
     public BookDto findById(Long id) {
         Book book = bookRepository.findById(id).orElseThrow(
@@ -42,6 +44,7 @@ public class BookServiceImpl implements BookService {
         return bookMapper.toDto(book);
     }
 
+    @ExceptionHandler
     @Override
     public BookDto update(BookDto bookDto, Long id) {
         Book updatedBook = bookRepository.findById(id)
