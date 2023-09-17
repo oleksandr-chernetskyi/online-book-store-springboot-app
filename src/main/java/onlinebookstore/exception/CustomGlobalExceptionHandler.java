@@ -44,20 +44,32 @@ public class CustomGlobalExceptionHandler extends ResponseEntityExceptionHandler
     protected ResponseEntity<Object> handleEntityNotFoundException(
             EntityNotFoundException ex,
             HttpHeaders headers,
-            HttpStatusCode status
+            HttpStatus status
     ) {
-        Map<String, Object> body = new LinkedHashMap<>();
-        body.put(TIMESTAMP, LocalDateTime.now());
-        body.put(STATUS, HttpStatus.NOT_FOUND);
-
-        String error = ex.getMessage();
-        body.put(ERRORS, error);
-        return new ResponseEntity<>(body, headers, status);
+        return handleException(ex, headers, status);
     }
 
     @ExceptionHandler(KeyNotSupportException.class)
     protected ResponseEntity<Object> handleKeyNotSupportedException(
             KeyNotSupportException ex,
+            HttpHeaders headers,
+            HttpStatus status
+    ) {
+        return handleException(ex, headers, status);
+    }
+
+    @ExceptionHandler(IllegalSpecificationArgumentException.class)
+    protected ResponseEntity<Object> handleIllegalSpecificationArgumentException(
+            IllegalSpecificationArgumentException ex,
+            HttpHeaders headers,
+            HttpStatus status
+    ) {
+        return handleException(ex, headers, status);
+    }
+
+    @ExceptionHandler
+    private ResponseEntity<Object> handleException(
+            RuntimeException ex,
             HttpHeaders headers,
             HttpStatus status
     ) {
@@ -67,6 +79,7 @@ public class CustomGlobalExceptionHandler extends ResponseEntityExceptionHandler
 
         String error = ex.getMessage();
         body.put(ERRORS, error);
+
         return new ResponseEntity<>(body, headers, status);
     }
 
