@@ -1,6 +1,5 @@
 package onlinebookstore.repository.book.specification;
 
-import java.util.Arrays;
 import onlinebookstore.model.Book;
 import onlinebookstore.repository.SpecificationProvider;
 import org.springframework.data.jpa.domain.Specification;
@@ -19,6 +18,6 @@ public class AuthorSpecificationProvider implements SpecificationProvider<Book> 
     @Override
     public Specification<Book> getSpecification(String[] parameters) {
         return ((root, query, criteriaBuilder) -> root.get(FIELD_NAME)
-                .in(Arrays.stream(parameters).toArray()));
+                .in(parameters));
     }
 }

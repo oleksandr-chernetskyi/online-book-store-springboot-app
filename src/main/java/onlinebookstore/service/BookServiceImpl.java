@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import onlinebookstore.dto.BookDto;
 import onlinebookstore.dto.CreateBookRequestDto;
 import onlinebookstore.exception.EntityNotFoundException;
+import onlinebookstore.exception.IllegalSpecificationArgumentException;
 import onlinebookstore.mapper.BookMapper;
 import onlinebookstore.model.Book;
 import onlinebookstore.repository.SpecificationManager;
@@ -70,7 +71,10 @@ public class BookServiceImpl implements BookService {
             specification = specification == null
                     ? Specification.where(spec) : specification.and(spec);
         }
-        assert specification != null;
+        if (specification == null) {
+            throw new IllegalSpecificationArgumentException(
+                    "Invalid combination of filterKey and value");
+        }
         return bookRepository.findAll(specification, pageable).stream()
                 .map(bookMapper::toDto)
                 .collect(Collectors.toList());
