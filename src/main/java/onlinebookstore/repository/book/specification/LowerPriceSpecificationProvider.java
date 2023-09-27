@@ -1,7 +1,6 @@
 package onlinebookstore.repository.book.specification;
 
-import java.math.BigDecimal;
-import java.util.Arrays;
+import jakarta.persistence.criteria.Predicate;
 import onlinebookstore.model.Book;
 import onlinebookstore.repository.SpecificationProvider;
 import org.springframework.data.jpa.domain.Specification;
@@ -19,11 +18,10 @@ public class LowerPriceSpecificationProvider implements SpecificationProvider<Bo
 
     @Override
     public Specification<Book> getSpecification(String[] parameters) {
-        return ((root, query, criteriaBuilder) ->
-                criteriaBuilder.greaterThanOrEqualTo(root.get(FIELD_NAME),
-                        Arrays.stream(parameters)
-                                .map(BigDecimal::new)
-                                .min(BigDecimal::compareTo)
-                                .orElse(BigDecimal.ZERO)));
+        return ((root, query, criteriaBuilder) -> {
+            Predicate predicate = criteriaBuilder
+                    .lessThanOrEqualTo(root.get(FIELD_NAME), parameters[0]);
+            return criteriaBuilder.and(predicate);
+        });
     }
 }
