@@ -33,7 +33,9 @@ public class CustomGlobalExceptionHandler extends ResponseEntityExceptionHandler
         body.put(TIMESTAMP, LocalDateTime.now());
         body.put(STATUS, HttpStatus.BAD_REQUEST);
 
-        List<String> errors = ex.getBindingResult().getAllErrors().stream()
+        List<String> errors = ex.getBindingResult()
+                .getAllErrors()
+                .stream()
                 .map(this::getErrorsMessage)
                 .toList();
         body.put(ERRORS, errors);

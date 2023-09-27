@@ -1,5 +1,7 @@
 package onlinebookstore.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.List;
 import java.util.Map;
@@ -20,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+@Tag(name = "Book management", description = "Endpoints for managing books")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(value = "api/books")
@@ -28,31 +31,43 @@ public class BookController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
+    @Operation(summary = "Create a new book",
+            description = "Create a new book")
     public BookDto createBook(@RequestBody @Valid CreateBookRequestDto requestDto) {
         return bookService.save(requestDto);
     }
 
     @GetMapping
-    public List<BookDto> findAll() {
-        return bookService.findAll();
+    @Operation(summary = "Get all books",
+            description = "Get a list of all available books")
+    public List<BookDto> findAll(Pageable pageable) {
+        return bookService.findAll(pageable);
     }
 
     @GetMapping("/{id}")
+    @Operation(summary = "Get book by id",
+            description = "Get existing book by id")
     public BookDto findById(@PathVariable Long id) {
         return bookService.findById(id);
     }
 
     @PutMapping("/{id}")
+    @Operation(summary = "Update book",
+            description = "Search and Update existing book by id")
     public BookDto update(@PathVariable Long id, @RequestBody BookDto bookDto) {
         return bookService.update(bookDto, id);
     }
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping("/{id}")
+    @Operation(summary = "Delete book by id",
+            description = "Search and Delete existing book by id")
     public void delete(@PathVariable Long id) {
         bookService.deleteById(id);
     }
 
+    @Operation(summary = "Book search",
+            description = "Search for a book using specified parameters")
     @GetMapping("/search")
     public List<BookDto> searchBooks(@RequestParam Map<String, String> parameters,
             Pageable pageable) {
